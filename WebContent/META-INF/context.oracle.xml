@@ -1,0 +1,15 @@
+<Context>
+	<Resource 
+		name="jdbc/backoffice" 
+		auth="Container"
+		type="javax.sql.DataSource" 
+		maxActive="100" 
+		maxIdle="30"
+		maxWait="10000" 
+		username="backoffice" 
+		password="backoffice"
+		driverClassName="oracle.jdbc.OracleDriver"
+		url="jdbc:oracle:thin:@oracle:1521:orcl"
+		testOnBorrow="true"
+		/>
+</Context>
