@@ -1,7 +1,10 @@
 package eu.christopherlee.admin.database;
 
-public abstract class Database {
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+public abstract class Database {
+	private static final Log log = LogFactory.getLog(Database.class);
 	public static String doSelect(String champs, String table, String condition) {
 		assert champs != null;
 		assert table != null;
@@ -11,7 +14,7 @@ public abstract class Database {
 			sql += " WHERE " + condition;
 		}
 
-		System.out.println(sql);
+		log.info(sql);
 		return sql;
 	}
 
@@ -25,7 +28,7 @@ public abstract class Database {
 		}
 		sql += " VALUES (" + valeurs + ")";
 
-		System.out.println(sql);
+		log.info(sql);
 		return sql;
 	}
 
@@ -38,7 +41,7 @@ public abstract class Database {
 		String sql = "UPDATE " + table + " SET " + champsValeur + " WHERE "
 				+ condition;
 
-		System.out.println(sql);
+		log.info(sql);
 		return sql;
 	}
 
@@ -48,7 +51,7 @@ public abstract class Database {
 
 		String sql = "DELETE FROM " + table + " WHERE " + condition;
 
-		System.out.println(sql);
+		log.info(sql);
 		return sql;
 	}
 }

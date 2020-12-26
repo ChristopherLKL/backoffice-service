@@ -45,6 +45,7 @@
 
 	<bean name="tpLinkTask" class="eu.christopherlee.admin.manager.TpLinkTask" autowire="byType">
 		<property name="manager" ref="tpLinkManager" />
-		<property name="gson" ref="gson" />
 	</bean>
+
+	<bean name="backofficeService" class="eu.christopherlee.admin.service.BackofficeServiceImpl" />
 </beans>

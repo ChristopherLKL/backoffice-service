@@ -3,9 +3,11 @@ package eu.christopherlee.admin.manager;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,6 +19,8 @@ import eu.christopherlee.admin.client.TpLinkClient;
 import eu.christopherlee.admin.database.TpLinkDao;
 import eu.christopherlee.admin.tplink.model.Account;
 import eu.christopherlee.admin.tplink.model.Device;
+import eu.christopherlee.admin.tplink.model.DeviceState;
+import eu.christopherlee.admin.tplink.model.ResponseData;
 import eu.christopherlee.admin.tplink.model.Result;
 
 public class TpLinkManager implements InitializingBean {
@@ -54,7 +58,7 @@ public class TpLinkManager implements InitializingBean {
 		return "hello";
 	}
 
-	public Account fetchAccount() {
+	private Account fetchAccount() {
 		Account account = null;
 		try {
 			String clientAccount = client.createToken();
@@ -70,7 +74,7 @@ public class TpLinkManager implements InitializingBean {
 		return account;
 	}
 
-	public List<Device> fetchDevices(String token) {
+	private List<Device> fetchDevices(String token) {
 		List<Device> devices = null;
 		try {
 			String clientDevices = client.getDeviceList(token);
@@ -94,6 +98,47 @@ public class TpLinkManager implements InitializingBean {
 			e.printStackTrace();
 		}
 		return devices;
+	}
+
+	public void scheduledTask() {
+		Account account = dao.getAccount();
+		if (account == null) {
+			account = this.fetchAccount();
+			try {
+				dao.insertAccount(account);
+			} catch (Exception e) {
+				dao.insertAccount(account, account.getAccountId());
+			}
+		}
+
+		List<Device> devices = dao.getDevices();
+
+		if (CollectionUtils.isEmpty(devices)) {
+			account = this.fetchAccount();
+			devices = this.fetchDevices(account.getToken());
+		}
+
+		if (CollectionUtils.isNotEmpty(devices)) {
+			for (Device device : devices) {
+				try {
+					String clientDeviceState = client.getState(device.getAppServerUrl(), account.getToken(), device.getDeviceId());
+					Result<ResponseData> result = (Result<ResponseData>) gson.fromJson(clientDeviceState, Result.class);
+					ResponseData responseData = gson.fromJson(gson.toJson(result.getResult()), ResponseData.class);
+					String deviceStateString = gson.fromJson(gson.toJson(responseData.getResponseData()), String.class);
+					DeviceState deviceState = gson.fromJson(deviceStateString, DeviceState.class);
+					deviceState.getEmeter().getGet_realtime().setStartTime(new Date());
+					dao.insertDeviceState(deviceState);
+				} catch (URISyntaxException e) {
+					log.error(e);
+					e.printStackTrace();
+				} catch (IOException e) {
+					log.error(e);
+					e.printStackTrace();
+				}
+			}
+		}
+
+		dao.deleteDeviceState(3);
 	}
 	
 	public void afterPropertiesSet() throws Exception {
