@@ -11,21 +11,26 @@ import org.springframework.beans.factory.InitializingBean;
 
 import eu.christopherlee.admin.manager.TpLinkManager;
 import eu.christopherlee.admin.model.User;
+import eu.christopherlee.admin.tplink.model.Account;
 
 @Path("/services")
 public class BackofficeServiceImpl implements InitializingBean {
 	private static final Log log = LogFactory.getLog(BackofficeServiceImpl.class);
-	
+
 	private TpLinkManager manager;
+	
+	public void setManager(TpLinkManager manager) {
+		this.manager = manager;
+	}
 
 	@GET
 	@Path("/login")
 	@Produces(MediaType.APPLICATION_JSON)
 	public User login() {
-		manager = new TpLinkManager();	
-		log.info(manager.getHelloWorld());
+		Account account = manager.getDao().getAccount();
+		log.info(account.getEmail());
 		User newUser = new User();
-		newUser.setUsername(manager.getHelloWorld());
+		newUser.setUsername(account.getEmail());
 		newUser.setPassword("titi");
 		return newUser;
 	}

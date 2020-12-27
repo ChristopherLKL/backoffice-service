@@ -47,5 +47,7 @@
 		<property name="manager" ref="tpLinkManager" />
 	</bean>
 
-	<bean name="backofficeService" class="eu.christopherlee.admin.service.BackofficeServiceImpl" />
+	<bean name="backofficeService" class="eu.christopherlee.admin.service.BackofficeServiceImpl" autowire="byType">
+		<property name="manager" ref="tpLinkManager" />
+	</bean>
 </beans>
