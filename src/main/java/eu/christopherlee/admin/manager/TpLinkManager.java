@@ -11,6 +11,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -25,10 +28,15 @@ import eu.christopherlee.admin.tplink.model.Result;
 
 public class TpLinkManager implements InitializingBean {
 	private static final Log log = LogFactory.getLog(TpLinkManager.class);
+	private TransactionTemplate transactionTemplate;
 	private TpLinkClient client;
 	private TpLinkDao dao;
 	private Gson gson;
 	private TpLinkTask task;
+
+	public void setTransactionTemplate(TransactionTemplate transactionTemplate) {
+		this.transactionTemplate = transactionTemplate;
+	}
 
 	public TpLinkClient getClient() {
 		return client;
@@ -100,45 +108,54 @@ public class TpLinkManager implements InitializingBean {
 		return devices;
 	}
 
-	public void scheduledTask() {
-		Account account = dao.getAccount();
-		if (account == null) {
-			account = this.fetchAccount();
-			try {
-				dao.insertAccount(account);
-			} catch (Exception e) {
-				dao.insertAccount(account, account.getAccountId());
-			}
-		}
+	private void synchronizeStats() {
+		transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+			public void doInTransactionWithoutResult(TransactionStatus status) {
 
-		List<Device> devices = dao.getDevices();
-
-		if (CollectionUtils.isEmpty(devices)) {
-			account = this.fetchAccount();
-			devices = this.fetchDevices(account.getToken());
-		}
-
-		if (CollectionUtils.isNotEmpty(devices)) {
-			for (Device device : devices) {
-				try {
-					String clientDeviceState = client.getState(device.getAppServerUrl(), account.getToken(), device.getDeviceId());
-					Result<ResponseData> result = (Result<ResponseData>) gson.fromJson(clientDeviceState, Result.class);
-					ResponseData responseData = gson.fromJson(gson.toJson(result.getResult()), ResponseData.class);
-					String deviceStateString = gson.fromJson(gson.toJson(responseData.getResponseData()), String.class);
-					DeviceState deviceState = gson.fromJson(deviceStateString, DeviceState.class);
-					deviceState.getEmeter().getGet_realtime().setStartTime(new Date());
-					dao.insertDeviceState(deviceState);
-				} catch (URISyntaxException e) {
-					log.error(e);
-					e.printStackTrace();
-				} catch (IOException e) {
-					log.error(e);
-					e.printStackTrace();
+				Account account = dao.getAccount();
+				if (account == null) {
+					account = fetchAccount();
+					try {
+						dao.insertAccount(account);
+					} catch (Exception e) {
+						dao.insertAccount(account, account.getAccountId());
+					}
 				}
-			}
-		}
 
-		dao.deleteDeviceState(3);
+				List<Device> devices = dao.getDevices();
+
+				if (CollectionUtils.isEmpty(devices)) {
+					account = fetchAccount();
+					devices = fetchDevices(account.getToken());
+				}
+
+				if (CollectionUtils.isNotEmpty(devices)) {
+					for (Device device : devices) {
+						try {
+							String clientDeviceState = client.getState(device.getAppServerUrl(), account.getToken(), device.getDeviceId());
+							Result<ResponseData> result = (Result<ResponseData>) gson.fromJson(clientDeviceState, Result.class);
+							ResponseData responseData = gson.fromJson(gson.toJson(result.getResult()), ResponseData.class);
+							String deviceStateString = gson.fromJson(gson.toJson(responseData.getResponseData()), String.class);
+							DeviceState deviceState = gson.fromJson(deviceStateString, DeviceState.class);
+							deviceState.getEmeter().getGet_realtime().setStartTime(new Date());
+							dao.insertDeviceState(deviceState);
+						} catch (URISyntaxException e) {
+							log.error(e);
+							e.printStackTrace();
+						} catch (IOException e) {
+							log.error(e);
+							e.printStackTrace();
+						}
+					}
+				}
+
+				dao.deleteDeviceState(3);
+			}
+		});
+	}
+
+	public void scheduledTask() {
+		synchronizeStats();
 	}
 	
 	public void afterPropertiesSet() throws Exception {

@@ -41,6 +41,7 @@
 		<property name="dao" ref="tpLinkDao" />
 		<property name="task" ref="tpLinkTask" />
 		<property name="gson" ref="gson" />
+		<property name="transactionTemplate" ref="backofficeTransactionTemplate" />
 	</bean>
 
 	<bean name="tpLinkTask" class="eu.christopherlee.admin.manager.TpLinkTask" autowire="byType">
