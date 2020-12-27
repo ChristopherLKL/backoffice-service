@@ -14,7 +14,7 @@ import eu.christopherlee.admin.model.User;
 import eu.christopherlee.admin.tplink.model.Account;
 
 @Path("/services")
-public class BackofficeServiceImpl implements InitializingBean {
+public class BackofficeServiceImpl implements BackofficeService, InitializingBean {
 	private static final Log log = LogFactory.getLog(BackofficeServiceImpl.class);
 
 	private TpLinkManager manager;
