@@ -62,10 +62,6 @@ public class TpLinkManager implements InitializingBean {
 		this.dao = dao;
 	}
 
-	public String getHelloWorld() {
-		return "hello";
-	}
-
 	private Account fetchAccount() {
 		Account account = null;
 		try {
