@@ -78,15 +78,16 @@ public class TpLinkManager implements InitializingBean {
 		return account;
 	}
 
-	private List<Device> fetchDevices(String token) {
+	private List<Device> fetchDevices(Account account) {
 		List<Device> devices = null;
 		try {
-			String clientDevices = client.getDeviceList(token);
+			String clientDevices = client.getDeviceList(account.getToken());
 			Result<LinkedTreeMap<?, ?>> result = (Result<LinkedTreeMap<?, ?>>) gson.fromJson(clientDevices, Result.class);
 			List objects = (List) result.getResult().get("deviceList");
 			devices = new ArrayList<Device>();
 			for(Object object: objects) {
 				Device device = gson.fromJson(gson.toJson(object), Device.class);
+				device.setAccountId(account.getAccountId());
 				try {
 					dao.insertDevice(device);
 				} catch (Exception e) {
@@ -118,11 +119,11 @@ public class TpLinkManager implements InitializingBean {
 					}
 				}
 
-				List<Device> devices = dao.getDevices();
+				List<Device> devices = dao.getDevices(account.getAccountId());
 
 				if (CollectionUtils.isEmpty(devices)) {
 					account = fetchAccount();
-					devices = fetchDevices(account.getToken());
+					devices = fetchDevices(account);
 				}
 
 				if (CollectionUtils.isNotEmpty(devices)) {
@@ -157,6 +158,6 @@ public class TpLinkManager implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 	    Timer timer;
 	    timer = new Timer();
-	    timer.schedule(this.task, 1000, 300000); // every 5 minutes
+	    timer.schedule(this.task, 1000, 60000); // every minute
 	}
 }

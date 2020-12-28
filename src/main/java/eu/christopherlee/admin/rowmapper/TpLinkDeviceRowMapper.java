@@ -27,6 +27,7 @@ public class TpLinkDeviceRowMapper implements RowMapper<Device> {
 		device.setRole(rs.getInt("role"));
 		device.setSameRegion(rs.getBoolean("is_same_region"));
 		device.setStatus(rs.getInt("status"));
+		device.setAccountId(rs.getInt("account_id"));
 		return device;
 	}
 
