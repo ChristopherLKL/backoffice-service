@@ -72,7 +72,7 @@ public class TpLinkDaoImpl implements TpLinkDao {
 
 	public List<Device> getDevices(int accountId) {
 		String query = Database.doSelect(
-				"device_type, role, fw_ver, app_server_url, device_region, device_id, device_name, device_hw_ver, alias, device_mac, oem_id, device_model, hw_id, fw_id, is_same_region, status, d.account_id",
+				"device_type, role, fw_ver, app_server_url, device_region, device_id, device_name, device_hw_ver, alias, device_mac, oem_id, device_model, hw_id, fw_id, is_same_region, status, account_id",
 				Tables.TABLE_TPLINK_LAST_DEVICES, "account_id=?");
 		Object[] parameters = new Object[] { accountId };
 		List<Device> devices = jdbcTemplate.query(query, parameters, deviceRowMapper);

@@ -146,7 +146,7 @@ public class TpLinkManager implements InitializingBean {
 					}
 				}
 
-				dao.deleteDeviceState(3);
+				dao.deleteDeviceState(1);
 			}
 		});
 	}
