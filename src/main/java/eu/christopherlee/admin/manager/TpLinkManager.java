@@ -70,10 +70,8 @@ public class TpLinkManager implements InitializingBean {
 			account = gson.fromJson(gson.toJson(result.getResult()), Account.class);
 		} catch (URISyntaxException e) {
 			log.error(e);
-			e.printStackTrace();
 		} catch (IOException e) {
 			log.error(e);
-			e.printStackTrace();
 		}
 		return account;
 	}
@@ -97,10 +95,8 @@ public class TpLinkManager implements InitializingBean {
 			}
 		} catch (URISyntaxException e) {
 			log.error(e);
-			e.printStackTrace();
 		} catch (IOException e) {
 			log.error(e);
-			e.printStackTrace();
 		}
 		return devices;
 	}
@@ -138,10 +134,8 @@ public class TpLinkManager implements InitializingBean {
 							dao.insertDeviceState(deviceState);
 						} catch (URISyntaxException e) {
 							log.error(e);
-							e.printStackTrace();
 						} catch (IOException e) {
 							log.error(e);
-							e.printStackTrace();
 						}
 					}
 				}
@@ -152,7 +146,11 @@ public class TpLinkManager implements InitializingBean {
 	}
 
 	public void scheduledTask() {
-		synchronizeStats();
+		try {
+			synchronizeStats();
+		} catch (Exception e) {
+			log.error(e);
+		}
 	}
 	
 	public void afterPropertiesSet() throws Exception {

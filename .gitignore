@@ -3,3 +3,4 @@ src/main/resources/config.properties
 .settings/
 .project
 .classpath
+WebContent/META-INF/context.rpi.xml
