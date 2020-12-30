@@ -10,7 +10,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.InitializingBean;
 
 import eu.christopherlee.admin.manager.TpLinkManager;
 import eu.christopherlee.admin.model.User;
@@ -20,7 +19,7 @@ import eu.christopherlee.admin.tplink.model.DeviceState;
 import eu.christopherlee.admin.tplink.model.Period;
 
 @Path("/services")
-public class BackofficeServiceImpl implements BackofficeService, InitializingBean {
+public class BackofficeServiceImpl implements BackofficeService {
 	private static final Log log = LogFactory.getLog(BackofficeServiceImpl.class);
 
 	private TpLinkManager manager;
@@ -33,7 +32,7 @@ public class BackofficeServiceImpl implements BackofficeService, InitializingBea
 	@Path("/login")
 	@Produces(MediaType.APPLICATION_JSON)
 	public User login() {
-		Account account = manager.getDao().getAccount();
+		Account account = manager.getDao().getAccount(-1);
 		log.info(account.getEmail());
 		User newUser = new User();
 		newUser.setUsername(account.getEmail());
@@ -41,16 +40,12 @@ public class BackofficeServiceImpl implements BackofficeService, InitializingBea
 		return newUser;
 	}
 
-	public void afterPropertiesSet() throws Exception {
-	}
-
-
 	@GET
 	@Path("/tplink/account")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public Account getTpLinkAccount() {
-		return manager.getDao().getAccount();
+		return manager.getDao().getAccount(-1);
 	}
 
 	@GET
@@ -58,8 +53,7 @@ public class BackofficeServiceImpl implements BackofficeService, InitializingBea
 	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public List<Device> getTpLinkDevices(@PathParam("accountId") int accountId) {
-		Account account = new Account();
-		account.setAccountId(accountId);
+		Account account = manager.getDao().getAccount(accountId);
 		return manager.fetchDevices(account);
 	}
 

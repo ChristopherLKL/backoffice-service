@@ -10,7 +10,7 @@ import eu.christopherlee.admin.tplink.model.Period;
 public interface TpLinkDao {
 	void insertAccount(Account account);
 	void insertAccount(Account account, int accountId);
-	Account getAccount();
+	Account getAccount(int accountId);
 	void insertDevice(Device device);
 	void insertDevice(Device device, String deviceId);
 	List<Device> getDevices(int accountId);

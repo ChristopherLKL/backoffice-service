@@ -112,7 +112,7 @@ public class TpLinkManager implements InitializingBean {
 		transactionTemplate.execute(new TransactionCallbackWithoutResult() {
 			public void doInTransactionWithoutResult(TransactionStatus status) {
 
-				Account account = dao.getAccount();
+				Account account = dao.getAccount(-1);
 				if (account == null) {
 					account = fetchAccount();
 					try {

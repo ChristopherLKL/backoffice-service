@@ -39,10 +39,14 @@ public class TpLinkDaoImpl implements TpLinkDao {
 		jdbcTemplate.update(query, parameters);
 	}
 
-	public Account getAccount() {
+	public Account getAccount(int accountId) {
 		String query = Database.doSelect("account_id, reg_time, country_code, email, token",
-				Tables.TABLE_TPLINK_LAST_CONNECT, null);
-		List<Account> accounts = jdbcTemplate.query(query, accountRowMapper);
+				Tables.TABLE_TPLINK_LAST_CONNECT, (accountId != -1 ? "account_id=?" : null));
+		Object[] parameters = null;
+		if(accountId != -1) {
+			parameters = new Object[] { accountId };
+		}
+		List<Account> accounts = jdbcTemplate.query(query, parameters, accountRowMapper);
 		return (CollectionUtils.isEmpty(accounts) ? null : accounts.get(0));
 	}
 
