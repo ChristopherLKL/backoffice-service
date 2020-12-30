@@ -28,11 +28,14 @@ import eu.christopherlee.admin.tplink.model.Result;
 
 public class TpLinkManager implements InitializingBean {
 	private static final Log log = LogFactory.getLog(TpLinkManager.class);
+	private final int START = 1000; // 1 second
+	private final int INTERVAL = 60000; // every minute
 	private TransactionTemplate transactionTemplate;
 	private TpLinkClient client;
 	private TpLinkDao dao;
-	private Gson gson;
 	private TpLinkTask task;
+	private Gson gson;
+    private Timer timer;
 
 	public void setTransactionTemplate(TransactionTemplate transactionTemplate) {
 		this.transactionTemplate = transactionTemplate;
@@ -46,20 +49,24 @@ public class TpLinkManager implements InitializingBean {
 		return dao;
 	}
 
-	public void setGson(Gson gson) {
-		this.gson = gson;
-	}
-
-	public void setTask(TpLinkTask task) {
-		this.task = task;
-	}
-
 	public void setClient(TpLinkClient client) {
 		this.client = client;
 	}
 
 	public void setDao(TpLinkDao dao) {
 		this.dao = dao;
+	}
+
+	public void setTask(TpLinkTask task) {
+		this.task = task;
+	}
+
+	public void setGson(Gson gson) {
+		this.gson = gson;
+	}
+
+	public void setTimer(Timer timer) {
+		this.timer = timer;
 	}
 
 	private Account fetchAccount() {
@@ -76,7 +83,7 @@ public class TpLinkManager implements InitializingBean {
 		return account;
 	}
 
-	private List<Device> fetchDevices(Account account) {
+	public List<Device> fetchDevices(Account account) {
 		List<Device> devices = null;
 		try {
 			String clientDevices = client.getDeviceList(account.getToken());
@@ -154,8 +161,6 @@ public class TpLinkManager implements InitializingBean {
 	}
 	
 	public void afterPropertiesSet() throws Exception {
-	    Timer timer;
-	    timer = new Timer();
-	    timer.schedule(this.task, 1000, 60000); // every minute
+	    timer.schedule(this.task, START, INTERVAL);
 	}
 }

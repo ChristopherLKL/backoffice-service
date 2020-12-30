@@ -58,7 +58,9 @@ public class BackofficeServiceImpl implements BackofficeService, InitializingBea
 	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public List<Device> getTpLinkDevices(@PathParam("accountId") int accountId) {
-		return manager.getDao().getDevices(accountId);
+		Account account = new Account();
+		account.setAccountId(accountId);
+		return manager.fetchDevices(account);
 	}
 
 	@GET

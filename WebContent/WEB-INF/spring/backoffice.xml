@@ -35,13 +35,15 @@
 	</bean>
 
 	<bean name="gson" class="com.google.gson.Gson" />
+	<bean name="timer" class="java.util.Timer" />
 
 	<bean name="tpLinkManager" class="eu.christopherlee.admin.manager.TpLinkManager" autowire="byType">
+		<property name="transactionTemplate" ref="backofficeTransactionTemplate" />
 		<property name="client" ref="tpLinkClient" />
 		<property name="dao" ref="tpLinkDao" />
 		<property name="task" ref="tpLinkTask" />
 		<property name="gson" ref="gson" />
-		<property name="transactionTemplate" ref="backofficeTransactionTemplate" />
+		<property name="timer" ref="timer" />
 	</bean>
 
 	<bean name="tpLinkTask" class="eu.christopherlee.admin.manager.TpLinkTask" autowire="byType">

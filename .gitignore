@@ -1,6 +1,6 @@
 target/
-src/main/resources/config.properties
 .settings/
 .project
 .classpath
 WebContent/META-INF/context.rpi.xml
+src/main/resources/config.private.properties
