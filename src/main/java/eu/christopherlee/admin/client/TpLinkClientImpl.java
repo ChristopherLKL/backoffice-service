@@ -9,9 +9,6 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import eu.christopherlee.admin.client.TpLinkClient;
-import eu.christopherlee.admin.manager.TpLinkTask;
-
 public class TpLinkClientImpl extends RestClient implements TpLinkClient {
 	private static final Log log = LogFactory.getLog(TpLinkClient.class);
 	private String endPoint;
@@ -56,7 +53,6 @@ public class TpLinkClientImpl extends RestClient implements TpLinkClient {
 			deviceParams.put("terminalUUID", UUID.randomUUID());
 		} catch (JSONException e) {
 			log.error(e);
-			e.printStackTrace();
 		}
 		return this.post(this.endPoint, device);
 	}
@@ -67,7 +63,6 @@ public class TpLinkClientImpl extends RestClient implements TpLinkClient {
 			json.put("method", "getDeviceList");
 		} catch (JSONException e) {
 			log.error(e);
-			e.printStackTrace();
 		}
 		return this.post(this.tokenUrl + token, json);
 	}
@@ -82,7 +77,6 @@ public class TpLinkClientImpl extends RestClient implements TpLinkClient {
 			deviceParams.put("requestData", "{\"system\":{\"get_sysinfo\":null},\"emeter\":{\"get_realtime\":null}}");
 		} catch (JSONException e) {
 			log.error(e);
-			e.printStackTrace();
 		}
 		return this.post(uri + "?token=" + token, device);
 	}
@@ -97,7 +91,6 @@ public class TpLinkClientImpl extends RestClient implements TpLinkClient {
 			deviceParams.put("requestData", "{\"system\":{\"set_relay_state\":{\"state\": " + state + "}}");
 		} catch (JSONException e) {
 			log.error(e);
-			e.printStackTrace();
 		}
 		return this.post(uri + "?token=" + token, device);
 	}

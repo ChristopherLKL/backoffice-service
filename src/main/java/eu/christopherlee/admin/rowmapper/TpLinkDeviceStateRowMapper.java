@@ -44,11 +44,11 @@ public class TpLinkDeviceStateRowMapper implements RowMapper<DeviceState> {
 		Emeter emeter = new Emeter();
 		ds.setEmeter(emeter);
 		emeter.setGet_realtime(get_realtime);
-		get_realtime.setCurrent(rs.getInt("current"));
-		get_realtime.setPower(rs.getInt("power"));
-		get_realtime.setStartTime(rs.getDate("start_time"));
-		get_realtime.setTotal(rs.getInt("total"));
-		get_realtime.setVoltage(rs.getInt("voltage"));
+		get_realtime.setCurrent(rs.getFloat("current"));
+		get_realtime.setPower(rs.getFloat("power"));
+		get_realtime.setStartTimeStr(rs.getString("start_time"));
+		get_realtime.setTotal(rs.getFloat("total"));
+		get_realtime.setVoltage(rs.getFloat("voltage"));
 		
 		return ds;
 	}
