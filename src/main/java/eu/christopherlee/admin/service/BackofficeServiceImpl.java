@@ -2,6 +2,7 @@ package eu.christopherlee.admin.service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -64,7 +65,7 @@ public class BackofficeServiceImpl implements BackofficeService {
 	@Override
 	public List<Device> getTpLinkDevices(@PathParam("accountId") int accountId) {
 		Account account = manager.getDao().getAccount(accountId);
-		List<Device> devices = manager.fetchDevices(account);
+		List<Device> devices = manager.getDao().getDevices(accountId);
 		for(Device device : devices) {
 			try {
 				String clientDeviceState = manager.getClient().getState(device.getAppServerUrl(), account.getToken(), device.getDeviceId());
@@ -88,4 +89,32 @@ public class BackofficeServiceImpl implements BackofficeService {
 		return manager.getDao().getDeviceState(accountId, deviceId, period);
 	}
 
+	@GET
+	@Path("/tplink/{accountId}/devices/state")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Override
+	public List<DeviceState> getTpLinkCurrentDevicesState(@PathParam("accountId") int accountId) {
+		Account account = manager.getDao().getAccount(accountId);
+		List<Device> devices = manager.getDao().getDevices(accountId);
+		List<DeviceState> states = new ArrayList<DeviceState>();
+		for(Device device: devices) {
+			String clientDeviceState;
+			try {
+				clientDeviceState = manager.getClient().getState(device.getAppServerUrl(), account.getToken(), device.getDeviceId());
+				Result<ResponseData> result = (Result<ResponseData>) gson.fromJson(clientDeviceState, Result.class);
+				ResponseData responseData = gson.fromJson(gson.toJson(result.getResult()), ResponseData.class);
+				String deviceStateString = gson.fromJson(gson.toJson(responseData.getResponseData()), String.class);
+				DeviceState deviceState = gson.fromJson(deviceStateString, DeviceState.class);
+				if("2.0".equals(deviceState.getSystem().getGet_sysinfo().getHw_ver())) {
+					deviceState.getEmeter().getGet_realtime().setPower((float) deviceState.getEmeter().getGet_realtime().getPower_mw() / 1000);
+					deviceState.getEmeter().getGet_realtime().setTotal((float) deviceState.getEmeter().getGet_realtime().getTotal_wh() / 1000);
+				}
+				states.add(deviceState);
+			} catch (URISyntaxException | IOException e) {
+				log.error(e);
+			}
+		}
+		return states;
+		
+	}
 }
