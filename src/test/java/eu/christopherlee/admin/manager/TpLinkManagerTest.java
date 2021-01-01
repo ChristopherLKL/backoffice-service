@@ -10,10 +10,10 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
@@ -23,7 +23,7 @@ public class TpLinkManagerTest {
 	
 
 	public static void main(String[] args) throws URISyntaxException, ClientProtocolException, IOException {
-		HttpClient client = new DefaultHttpClient();
+		CloseableHttpClient client = HttpClients.createDefault();
 		HttpResponse response;
 		
 		URI uri = new URI("https://eu-wap.tplinkcloud.com?token=c4ee52d2-BTNuYp9Vksy8mX88RwQmgaK");

@@ -73,7 +73,7 @@ public class TpLinkManager implements InitializingBean {
 		Account account = null;
 		try {
 			String clientAccount = client.createToken();
-			Result<Account> result = (Result<Account>) gson.fromJson(clientAccount, Result.class);
+			Result<?> result = (Result<?>) gson.fromJson(clientAccount, Result.class);
 			account = gson.fromJson(gson.toJson(result.getResult()), Account.class);
 		} catch (URISyntaxException e) {
 			log.error(e);
@@ -87,8 +87,9 @@ public class TpLinkManager implements InitializingBean {
 		List<Device> devices = null;
 		try {
 			String clientDevices = client.getDeviceList(account.getToken());
-			Result<LinkedTreeMap<?, ?>> result = (Result<LinkedTreeMap<?, ?>>) gson.fromJson(clientDevices, Result.class);
-			List objects = (List) result.getResult().get("deviceList");
+			Result<?> result = (Result<?>) gson.fromJson(clientDevices, Result.class);
+			LinkedTreeMap<?, ?> map = gson.fromJson(gson.toJson(result.getResult()), LinkedTreeMap.class);
+			List<?> objects = (List<?>) map.get("deviceList");
 			devices = new ArrayList<Device>();
 			for(Object object: objects) {
 				Device device = gson.fromJson(gson.toJson(object), Device.class);
@@ -133,7 +134,7 @@ public class TpLinkManager implements InitializingBean {
 					for (Device device : devices) {
 						try {
 							String clientDeviceState = client.getState(device.getAppServerUrl(), account.getToken(), device.getDeviceId());
-							Result<ResponseData> result = (Result<ResponseData>) gson.fromJson(clientDeviceState, Result.class);
+							Result<?> result = (Result<?>) gson.fromJson(clientDeviceState, Result.class);
 							ResponseData responseData = gson.fromJson(gson.toJson(result.getResult()), ResponseData.class);
 							String deviceStateString = gson.fromJson(gson.toJson(responseData.getResponseData()), String.class);
 							DeviceState deviceState = gson.fromJson(deviceStateString, DeviceState.class);

@@ -9,17 +9,17 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.json.JSONObject;
 
 public class RestClient {
 	protected String post(String stringUri, JSONObject json) throws URISyntaxException, IOException {
-		HttpClient client = new DefaultHttpClient();
+		CloseableHttpClient client = HttpClients.createDefault();
 		HttpResponse response;
 
 		URI uri = new URI(stringUri);
