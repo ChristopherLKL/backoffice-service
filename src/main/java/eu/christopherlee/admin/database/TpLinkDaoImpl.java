@@ -79,8 +79,7 @@ public class TpLinkDaoImpl implements TpLinkDao {
 				"device_type, role, fw_ver, app_server_url, device_region, device_id, device_name, device_hw_ver, alias, device_mac, oem_id, device_model, hw_id, fw_id, is_same_region, status, d.account_id, a.token",
 				Tables.TABLE_TPLINK_LAST_DEVICES + " d inner join " + Tables.TABLE_TPLINK_LAST_CONNECT + " a on d.account_id=a.account_id", "d.account_id=?");
 		Object[] parameters = new Object[] { accountId };
-		List<Device> devices = jdbcTemplate.query(query, parameters, deviceRowMapper);
-		return devices;
+		return jdbcTemplate.query(query, parameters, deviceRowMapper);
 	}
 
 	public void insertDeviceState(DeviceState deviceState) {
@@ -107,19 +106,18 @@ public class TpLinkDaoImpl implements TpLinkDao {
 		jdbcTemplate.update(query, parameters);
 	}
 
-	public List<DeviceState> getDeviceState(int accountId, String deviceId, Period period) {
+	public List<DeviceState> getDeviceStates(int accountId, String deviceId, Period period) {
 		String query = Database.doSelect(
 				"ds.sw_ver, ds.hw_ver, ds.type, ds.model, ds.mac, ds.device_id, ds.hw_id, ds.fw_id, ds.oem_id, ds.alias, ds.dev_name, ds.icon_hash, ds.relay_state, ds.on_time, ds.active_mode, ds.feature, ds.updating, ds.rssi, ds.led_off, ds.latitude, ds.longitude, ds.current, ds.voltage, ds.power, ds.total, ds.start_time",
 				Tables.TABLE_TPLINK_DEVICE_STATE + " ds inner join " + Tables.TABLE_TPLINK_LAST_DEVICES + " d on ds.device_id=d.device_id inner join " + Tables.TABLE_TPLINK_LAST_CONNECT + " a on a.account_id=d.account_id", "d.account_id=? and ds.device_id=? and ds.start_time >= NOW() - INTERVAL ? " + period);
 		Object[] parameters = new Object[] { accountId, deviceId, "1" };
-		List<DeviceState> deviceState = jdbcTemplate.query(query, parameters, deviceStateRowMapper);
-		return deviceState;
+		return jdbcTemplate.query(query, parameters, deviceStateRowMapper);
 	}
 
-	public void deleteDeviceState(int months) {
-		String sql = Database.doDelete(Tables.TABLE_TPLINK_DEVICE_STATE, "start_time <= NOW() - INTERVAL ? MONTH");
+	public void deleteDeviceState(int days) {
+		String sql = Database.doDelete(Tables.TABLE_TPLINK_DEVICE_STATE, "start_time <= NOW() - INTERVAL ? DAY");
 
-		Object[] parameters = new Object[] { months };
+		Object[] parameters = new Object[] { days };
 
 		jdbcTemplate.update(sql, parameters);
 	}

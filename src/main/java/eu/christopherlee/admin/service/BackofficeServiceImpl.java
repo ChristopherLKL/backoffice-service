@@ -75,7 +75,7 @@ public class BackofficeServiceImpl implements BackofficeService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public List<DeviceState> getTpLinkDeviceStates(@PathParam("accountId") int accountId, @PathParam("id") String deviceId, @PathParam("period") Period period) {
-		return manager.getDao().getDeviceState(accountId, deviceId, period);
+		return manager.getDao().getDeviceStates(accountId, deviceId, period);
 	}
 
 	@GET

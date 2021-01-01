@@ -28,14 +28,27 @@ import eu.christopherlee.admin.tplink.model.Result;
 
 public class TpLinkManager implements InitializingBean {
 	private static final Log log = LogFactory.getLog(TpLinkManager.class);
-	private final int START = 1000; // 1 second
-	private final int INTERVAL = 60000; // every minute
+	private int start;
+	private int interval;
+	private int purgeDays;
 	private TransactionTemplate transactionTemplate;
 	private TpLinkClient client;
 	private TpLinkDao dao;
 	private TpLinkTask task;
 	private Gson gson;
     private Timer timer;
+
+	public void setStart(int start) {
+		this.start = start;
+	}
+
+	public void setInterval(int interval) {
+		this.interval = interval;
+	}
+
+	public void setPurgeDays(int purgeDays) {
+		this.purgeDays = purgeDays;
+	}
 
 	public void setTransactionTemplate(TransactionTemplate transactionTemplate) {
 		this.transactionTemplate = transactionTemplate;
@@ -148,7 +161,7 @@ public class TpLinkManager implements InitializingBean {
 					}
 				}
 
-				dao.deleteDeviceState(1);
+				dao.deleteDeviceState(purgeDays);
 			}
 		});
 	}
@@ -162,6 +175,6 @@ public class TpLinkManager implements InitializingBean {
 	}
 	
 	public void afterPropertiesSet() throws Exception {
-	    timer.schedule(this.task, START, INTERVAL);
+	    timer.schedule(this.task, start, interval);
 	}
 }

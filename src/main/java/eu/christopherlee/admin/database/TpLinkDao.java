@@ -15,6 +15,6 @@ public interface TpLinkDao {
 	void insertDevice(Device device, String deviceId);
 	List<Device> getDevices(int accountId);
 	void insertDeviceState(DeviceState deviceState);
-	List<DeviceState> getDeviceState(int accountId, String deviceId, Period period);
+	List<DeviceState> getDeviceStates(int accountId, String deviceId, Period period);
 	void deleteDeviceState(int months);
 }

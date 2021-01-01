@@ -44,6 +44,9 @@
 		<property name="task" ref="tpLinkTask" />
 		<property name="gson" ref="gson" />
 		<property name="timer" ref="timer" />
+		<property name="start" value="${backofficeService.polling.start}" />
+		<property name="interval" value="${backofficeService.polling.interval}" />
+		<property name="purgeDays" value="${backofficeService.polling.purgeDays}" />
 	</bean>
 
 	<bean name="tpLinkTask" class="eu.christopherlee.admin.manager.TpLinkTask" autowire="byType">
