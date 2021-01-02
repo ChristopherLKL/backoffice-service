@@ -3,6 +3,7 @@ package eu.christopherlee.admin.service;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,6 +68,7 @@ public class BackofficeServiceImpl implements BackofficeService {
 				log.error(e);
 			}
 		}
+		Collections.sort(devices);
 		return devices;
 	}
 
@@ -75,7 +77,9 @@ public class BackofficeServiceImpl implements BackofficeService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public List<DeviceState> getTpLinkDeviceStates(@PathParam("accountId") int accountId, @PathParam("id") String deviceId, @PathParam("period") Period period) {
-		return manager.getDao().getDeviceStates(accountId, deviceId, period);
+		List<DeviceState> states = manager.getDao().getDeviceStates(accountId, deviceId, period);
+		Collections.sort(states);
+		return states;
 	}
 
 	@GET
@@ -98,18 +102,19 @@ public class BackofficeServiceImpl implements BackofficeService {
 					deviceState.getEmeter().getGet_realtime().setTotal((float) deviceState.getEmeter().getGet_realtime().getTotal_wh() / 1000);
 				}
 				states.add(deviceState);
-			} catch (URISyntaxException | IOException e) {
+			} catch (URISyntaxException | IOException | NullPointerException e) {
 				log.error(e);
 			}
 		}
+		Collections.sort(states);
 		return states;
 	}
 
 	@PUT
-	@Path("/tplink/{accountId}/device/{id}/state")
+	@Path("/tplink/{accountId}/device/{id}/state/{state}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Override
-	public void setTpLinkCurrentDeviceState(@PathParam("accountId") int accountId, @PathParam("id") String deviceId, RelayState relayState) {
+	public void setTpLinkCurrentDeviceState(@PathParam("accountId") int accountId, @PathParam("id") String deviceId, @PathParam("state") RelayState relayState) {
 		Device device = manager.getDao().getDevices(accountId).stream().filter(c -> c.getDeviceId().equals(deviceId)).collect(Collectors.toList()).get(0);
 		try {
 			manager.getClient().setState(device.getAppServerUrl(), device.getToken(), device.getDeviceId(), String.valueOf(relayState.getValue()));

@@ -88,7 +88,7 @@ public class TpLinkClientImpl extends RestClient implements TpLinkClient {
 			JSONObject deviceParams = new JSONObject();
 			device.put("params", deviceParams);
 			deviceParams.put("deviceId", deviceId);
-			deviceParams.put("requestData", "{\"system\":{\"set_relay_state\":{\"state\": " + state + "}}");
+			deviceParams.put("requestData", "{\"system\":{\"set_relay_state\":{\"state\": " + state + "}}}");
 		} catch (JSONException e) {
 			log.error(e);
 		}
