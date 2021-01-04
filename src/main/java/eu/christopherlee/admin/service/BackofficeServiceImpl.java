@@ -64,7 +64,7 @@ public class BackofficeServiceImpl implements BackofficeService {
 				String deviceStateString = gson.fromJson(gson.toJson(responseData.getResponseData()), String.class);
 				DeviceState deviceState = gson.fromJson(deviceStateString, DeviceState.class);
 				device.setDeviceState(deviceState);
-			} catch (URISyntaxException | IOException e) {
+			} catch (URISyntaxException | IOException | NullPointerException e) {
 				log.error(e);
 			}
 		}
