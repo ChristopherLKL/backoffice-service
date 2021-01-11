@@ -66,6 +66,8 @@ public class BackofficeServiceImpl implements BackofficeService {
 				device.setDeviceState(deviceState);
 			} catch (URISyntaxException | IOException | NullPointerException e) {
 				log.error(e);
+			} catch (Exception e) {
+				log.error(e);
 			}
 		}
 		Collections.sort(devices);
@@ -104,6 +106,8 @@ public class BackofficeServiceImpl implements BackofficeService {
 				states.add(deviceState);
 			} catch (URISyntaxException | IOException | NullPointerException e) {
 				log.error(e);
+			} catch (Exception e) {
+				log.error(e);
 			}
 		}
 		Collections.sort(states);
@@ -120,7 +124,8 @@ public class BackofficeServiceImpl implements BackofficeService {
 			manager.getClient().setState(device.getAppServerUrl(), device.getToken(), device.getDeviceId(), String.valueOf(relayState.getValue()));
 		} catch (URISyntaxException | IOException e) {
 			log.error(e);
+		} catch (Exception e) {
+			log.error(e);
 		}
-		
 	}
 }

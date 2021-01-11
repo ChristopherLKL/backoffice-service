@@ -17,12 +17,8 @@ public class TpLinkTask extends TimerTask {
 	public void run() {
 		try{
 			manager.scheduledTask();
-	    }catch (RuntimeException e){
-	        log.error("Uncaught Runtime Exception",e);
-	        return;
-	    }catch (Throwable e){
-	        log.error("Unrecoverable error",e);
-	        throw e;
+	    }catch (Exception e){
+	        log.error(e);
 	    }
 	}
 }

@@ -92,6 +92,8 @@ public class TpLinkManager implements InitializingBean {
 			log.error(e);
 		} catch (IOException e) {
 			log.error(e);
+		} catch (Exception e) {
+			log.error(e);
 		}
 		return account;
 	}
@@ -117,6 +119,8 @@ public class TpLinkManager implements InitializingBean {
 		} catch (URISyntaxException e) {
 			log.error(e);
 		} catch (IOException e) {
+			log.error(e);
+		} catch (Exception e) {
 			log.error(e);
 		}
 		return devices;
@@ -159,6 +163,8 @@ public class TpLinkManager implements InitializingBean {
 							log.error(e);
 						} catch (NullPointerException e) {
 							log.error(e);
+						} catch (Exception e) {
+							log.error(e);
 						}
 					}
 				}
@@ -176,7 +182,11 @@ public class TpLinkManager implements InitializingBean {
 		}
 	}
 	
-	public void afterPropertiesSet() throws Exception {
-	    timer.schedule(this.task, start, interval);
+	public void afterPropertiesSet() {
+		try {
+			timer.schedule(this.task, start, interval);
+		} catch (Exception e) {
+			log.error(e);
+		}
 	}
 }

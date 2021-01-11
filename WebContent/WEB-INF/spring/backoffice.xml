@@ -22,12 +22,15 @@
 		<property name="dataSource" ref="backofficeDataSource" />
 	</bean>
 
+	<bean name="jsonObject" class="org.json.JSONObject" />
+
 	<bean name="tpLinkClient" class="eu.christopherlee.admin.client.TpLinkClientImpl" autowire="byType">
 		<property name="endPoint" value="${tpLink.endPoint}" />
 		<property name="appType" value="${tpLink.params.appType}" />
 		<property name="cloudUserName" value="${tpLink.params.cloudUserName}" />
 		<property name="cloudPassword" value="${tpLink.params.cloudPassword}" />
 		<property name="tokenUrl" value="${tpLink.tokenUrl}" />
+		<property name="json" ref="jsonObject" />
 	</bean>
 
 	<bean name="tpLinkDao" class="eu.christopherlee.admin.database.TpLinkDaoImpl" autowire="byType">

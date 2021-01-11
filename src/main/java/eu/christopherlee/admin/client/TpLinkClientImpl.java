@@ -8,14 +8,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.InitializingBean;
 
-public class TpLinkClientImpl extends RestClient implements TpLinkClient {
+public class TpLinkClientImpl extends RestClient implements TpLinkClient, InitializingBean {
 	private static final Log log = LogFactory.getLog(TpLinkClient.class);
 	private String endPoint;
 	private String appType;
 	private String cloudUserName;
 	private String cloudPassword;
 	private String tokenUrl;
+	private JSONObject json;
+	private JSONObject subJson;
+
+	public void setJson(JSONObject json) {
+		this.json = json;
+	}
 
 	public String getEndPoint() {
 		return endPoint;
@@ -42,23 +49,20 @@ public class TpLinkClientImpl extends RestClient implements TpLinkClient {
 	}
 
 	public String createToken() throws URISyntaxException, IOException {
-		JSONObject device = new JSONObject();
 		try {
-			device.put("method", "login");
-			JSONObject deviceParams = new JSONObject();
-			device.put("params", deviceParams);
-			deviceParams.put("appType", this.appType);
-			deviceParams.put("cloudUserName", this.cloudUserName);
-			deviceParams.put("cloudPassword", this.cloudPassword);
-			deviceParams.put("terminalUUID", UUID.randomUUID());
+			json.put("method", "login");
+			json.put("params", subJson);
+			subJson.put("appType", this.appType);
+			subJson.put("cloudUserName", this.cloudUserName);
+			subJson.put("cloudPassword", this.cloudPassword);
+			subJson.put("terminalUUID", UUID.randomUUID());
 		} catch (JSONException e) {
 			log.error(e);
 		}
-		return this.post(this.endPoint, device);
+		return this.post(this.endPoint, json);
 	}
 
 	public String getDeviceList(String token) throws URISyntaxException, IOException {
-		JSONObject json = new JSONObject();
 		try {
 			json.put("method", "getDeviceList");
 		} catch (JSONException e) {
@@ -68,30 +72,31 @@ public class TpLinkClientImpl extends RestClient implements TpLinkClient {
 	}
 
 	public String getState(String uri, String token, String deviceId) throws URISyntaxException, IOException {
-		JSONObject device = new JSONObject();
 		try {
-			device.put("method", "passthrough");
-			JSONObject deviceParams = new JSONObject();
-			device.put("params", deviceParams);
-			deviceParams.put("deviceId", deviceId);
-			deviceParams.put("requestData", "{\"system\":{\"get_sysinfo\":null},\"emeter\":{\"get_realtime\":null}}");
+			json.put("method", "passthrough");
+			json.put("params", subJson);
+			subJson.put("deviceId", deviceId);
+			subJson.put("requestData", "{\"system\":{\"get_sysinfo\":null},\"emeter\":{\"get_realtime\":null}}");
 		} catch (JSONException e) {
 			log.error(e);
 		}
-		return this.post(uri + "?token=" + token, device);
+		return this.post(uri + "?token=" + token, json);
 	}
 
 	public String setState(String uri, String token, String deviceId, String state) throws URISyntaxException, IOException {
-		JSONObject device = new JSONObject();
 		try {
-			device.put("method", "passthrough");
-			JSONObject deviceParams = new JSONObject();
-			device.put("params", deviceParams);
-			deviceParams.put("deviceId", deviceId);
-			deviceParams.put("requestData", "{\"system\":{\"set_relay_state\":{\"state\": " + state + "}}}");
+			json.put("method", "passthrough");
+			json.put("params", subJson);
+			subJson.put("deviceId", deviceId);
+			subJson.put("requestData", "{\"system\":{\"set_relay_state\":{\"state\": " + state + "}}}");
 		} catch (JSONException e) {
 			log.error(e);
 		}
-		return this.post(uri + "?token=" + token, device);
+		return this.post(uri + "?token=" + token, json);
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		subJson = new JSONObject();
 	}
 }
