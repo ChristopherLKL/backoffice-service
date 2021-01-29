@@ -99,7 +99,7 @@ public class BackofficeServiceImpl implements BackofficeService {
 				ResponseData responseData = gson.fromJson(gson.toJson(result.getResult()), ResponseData.class);
 				String deviceStateString = gson.fromJson(gson.toJson(responseData.getResponseData()), String.class);
 				DeviceState deviceState = gson.fromJson(deviceStateString, DeviceState.class);
-				if("2.0".equals(deviceState.getSystem().getGet_sysinfo().getHw_ver())) {
+				if(!"1.0".equals(deviceState.getSystem().getGet_sysinfo().getHw_ver())) {
 					deviceState.getEmeter().getGet_realtime().setPower((float) deviceState.getEmeter().getGet_realtime().getPower_mw() / 1000);
 					deviceState.getEmeter().getGet_realtime().setTotal((float) deviceState.getEmeter().getGet_realtime().getTotal_wh() / 1000);
 				}

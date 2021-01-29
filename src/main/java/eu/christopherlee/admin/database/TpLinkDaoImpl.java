@@ -88,20 +88,20 @@ public class TpLinkDaoImpl implements TpLinkDao {
 				"sw_ver, hw_ver, type, model, mac, device_id, hw_id, fw_id, oem_id, alias, dev_name, icon_hash, relay_state, on_time, active_mode, feature, updating, rssi, led_off, latitude, longitude, current, voltage, power, total, start_time",
 				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
 		Object[] parameters = new Object[] { deviceState.getSystem().getGet_sysinfo().getSw_ver(), deviceState.getSystem().getGet_sysinfo().getHw_ver(),
-				deviceState.getSystem().getGet_sysinfo().getType(), deviceState.getSystem().getGet_sysinfo().getModel(), deviceState.getSystem().getGet_sysinfo().getMac(),
+				("4.0".equals(version) ? deviceState.getSystem().getGet_sysinfo().getMic_type() : deviceState.getSystem().getGet_sysinfo().getType()), deviceState.getSystem().getGet_sysinfo().getModel(), deviceState.getSystem().getGet_sysinfo().getMac(),
 				deviceState.getSystem().getGet_sysinfo().getDeviceId(), deviceState.getSystem().getGet_sysinfo().getHwId(),
-				deviceState.getSystem().getGet_sysinfo().getFwId(), deviceState.getSystem().getGet_sysinfo().getOemId(),
+				("4.0".equals(version) ? "" : deviceState.getSystem().getGet_sysinfo().getFwId()), deviceState.getSystem().getGet_sysinfo().getOemId(),
 				deviceState.getSystem().getGet_sysinfo().getAlias(), deviceState.getSystem().getGet_sysinfo().getDev_name(),
 				deviceState.getSystem().getGet_sysinfo().getIcon_hash(), deviceState.getSystem().getGet_sysinfo().getRelay_state(),
 				deviceState.getSystem().getGet_sysinfo().getOn_time(), deviceState.getSystem().getGet_sysinfo().getActive_mode(),
 				deviceState.getSystem().getGet_sysinfo().getFeature(), deviceState.getSystem().getGet_sysinfo().getUpdating(),
 				deviceState.getSystem().getGet_sysinfo().getRssi(), deviceState.getSystem().getGet_sysinfo().getLed_off(),
-				("2.0".equals(version) ? (float) deviceState.getSystem().getGet_sysinfo().getLatitude_i() / 10000 : deviceState.getSystem().getGet_sysinfo().getLatitude()),
-				("2.0".equals(version) ? (float) deviceState.getSystem().getGet_sysinfo().getLongitude_i() / 10000 : deviceState.getSystem().getGet_sysinfo().getLongitude()),
-				("2.0".equals(version) ? (float) deviceState.getEmeter().getGet_realtime().getCurrent_ma() / 1000 : deviceState.getEmeter().getGet_realtime().getCurrent()),
-				("2.0".equals(version) ? (float) deviceState.getEmeter().getGet_realtime().getVoltage_mv() / 1000 : deviceState.getEmeter().getGet_realtime().getVoltage()),
-				("2.0".equals(version) ? (float) deviceState.getEmeter().getGet_realtime().getPower_mw() / 1000 : deviceState.getEmeter().getGet_realtime().getPower()),
-				("2.0".equals(version) ? (float) deviceState.getEmeter().getGet_realtime().getTotal_wh() / 1000 : deviceState.getEmeter().getGet_realtime().getTotal()),
+				("1.0".equals(version) ? deviceState.getSystem().getGet_sysinfo().getLatitude() : (float) deviceState.getSystem().getGet_sysinfo().getLatitude_i() / 10000),
+				("1.0".equals(version) ? deviceState.getSystem().getGet_sysinfo().getLongitude() : (float) deviceState.getSystem().getGet_sysinfo().getLongitude_i() / 10000),
+				("1.0".equals(version) ? deviceState.getEmeter().getGet_realtime().getCurrent() : (float) deviceState.getEmeter().getGet_realtime().getCurrent_ma() / 1000),
+				("1.0".equals(version) ? deviceState.getEmeter().getGet_realtime().getVoltage() : (float) deviceState.getEmeter().getGet_realtime().getVoltage_mv() / 1000),
+				("1.0".equals(version) ? deviceState.getEmeter().getGet_realtime().getPower() : (float) deviceState.getEmeter().getGet_realtime().getPower_mw() / 1000),
+				("1.0".equals(version) ? deviceState.getEmeter().getGet_realtime().getTotal() : (float) deviceState.getEmeter().getGet_realtime().getTotal_wh() / 1000),
 				deviceState.getEmeter().getGet_realtime().getStartTime() };
 		jdbcTemplate.update(query, parameters);
 	}

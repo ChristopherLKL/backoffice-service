@@ -8,9 +8,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.InitializingBean;
 
-public class TpLinkClientImpl extends RestClient implements TpLinkClient, InitializingBean {
+public class TpLinkClientImpl extends RestClient implements TpLinkClient {
 	private static final Log log = LogFactory.getLog(TpLinkClient.class);
 	private String endPoint;
 	private String appType;
@@ -51,6 +50,7 @@ public class TpLinkClientImpl extends RestClient implements TpLinkClient, Initia
 	public String createToken() throws URISyntaxException, IOException {
 		try {
 			json.put("method", "login");
+			subJson = new JSONObject();
 			json.put("params", subJson);
 			subJson.put("appType", this.appType);
 			subJson.put("cloudUserName", this.cloudUserName);
@@ -74,6 +74,7 @@ public class TpLinkClientImpl extends RestClient implements TpLinkClient, Initia
 	public String getState(String uri, String token, String deviceId) throws URISyntaxException, IOException {
 		try {
 			json.put("method", "passthrough");
+			subJson = new JSONObject();
 			json.put("params", subJson);
 			subJson.put("deviceId", deviceId);
 			subJson.put("requestData", "{\"system\":{\"get_sysinfo\":null},\"emeter\":{\"get_realtime\":null}}");
@@ -86,6 +87,7 @@ public class TpLinkClientImpl extends RestClient implements TpLinkClient, Initia
 	public String setState(String uri, String token, String deviceId, String state) throws URISyntaxException, IOException {
 		try {
 			json.put("method", "passthrough");
+			subJson = new JSONObject();
 			json.put("params", subJson);
 			subJson.put("deviceId", deviceId);
 			subJson.put("requestData", "{\"system\":{\"set_relay_state\":{\"state\": " + state + "}}}");
@@ -93,10 +95,5 @@ public class TpLinkClientImpl extends RestClient implements TpLinkClient, Initia
 			log.error(e);
 		}
 		return this.post(uri + "?token=" + token, json);
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		subJson = new JSONObject();
 	}
 }
