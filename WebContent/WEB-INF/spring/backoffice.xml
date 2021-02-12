@@ -38,17 +38,12 @@
 	</bean>
 
 	<bean name="gson" class="com.google.gson.Gson" />
-	<bean name="timer" class="java.util.Timer" />
 
-	<bean name="tpLinkManager" class="eu.christopherlee.admin.manager.TpLinkManager" autowire="byType">
+	<bean id="tpLinkManager" name="tpLinkManager" class="eu.christopherlee.admin.manager.TpLinkManager" autowire="byType">
 		<property name="transactionTemplate" ref="backofficeTransactionTemplate" />
 		<property name="client" ref="tpLinkClient" />
 		<property name="dao" ref="tpLinkDao" />
-		<property name="task" ref="tpLinkTask" />
 		<property name="gson" ref="gson" />
-		<property name="timer" ref="timer" />
-		<property name="start" value="${backofficeService.polling.start}" />
-		<property name="interval" value="${backofficeService.polling.interval}" />
 		<property name="purgeDays" value="${backofficeService.polling.purgeDays}" />
 	</bean>
 
@@ -59,5 +54,29 @@
 	<bean name="backofficeService" class="eu.christopherlee.admin.service.BackofficeServiceImpl" autowire="byType">
 		<property name="manager" ref="tpLinkManager" />
 		<property name="gson" ref="gson" />
+	</bean>
+
+	<!-- QUARTZ configuration -->
+	<bean id="jobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="eu.christopherlee.admin.manager.TpLinkTask" />
+		<property name="jobDataMap">
+			<map>
+				<entry key="manager" value-ref="tpLinkManager" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="jobDetail" />
+		<property name="startDelay" value="${backofficeService.polling.start}" />
+		<property name="repeatInterval" value="${backofficeService.polling.interval}" />
+	</bean>
+
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="simpleTrigger" />
+			</list>
+		</property>
 	</bean>
 </beans>

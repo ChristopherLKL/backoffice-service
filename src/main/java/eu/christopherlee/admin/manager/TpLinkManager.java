@@ -5,12 +5,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Timer;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -26,25 +24,13 @@ import eu.christopherlee.admin.tplink.model.DeviceState;
 import eu.christopherlee.admin.tplink.model.ResponseData;
 import eu.christopherlee.admin.tplink.model.Result;
 
-public class TpLinkManager implements InitializingBean {
+public class TpLinkManager {
 	private static final Log log = LogFactory.getLog(TpLinkManager.class);
-	private int start;
-	private int interval;
 	private int purgeDays;
 	private TransactionTemplate transactionTemplate;
 	private TpLinkClient client;
 	private TpLinkDao dao;
-	private TpLinkTask task;
 	private Gson gson;
-    private Timer timer;
-
-	public void setStart(int start) {
-		this.start = start;
-	}
-
-	public void setInterval(int interval) {
-		this.interval = interval;
-	}
 
 	public void setPurgeDays(int purgeDays) {
 		this.purgeDays = purgeDays;
@@ -70,16 +56,8 @@ public class TpLinkManager implements InitializingBean {
 		this.dao = dao;
 	}
 
-	public void setTask(TpLinkTask task) {
-		this.task = task;
-	}
-
 	public void setGson(Gson gson) {
 		this.gson = gson;
-	}
-
-	public void setTimer(Timer timer) {
-		this.timer = timer;
 	}
 
 	private Account fetchAccount() {
@@ -177,14 +155,6 @@ public class TpLinkManager implements InitializingBean {
 	public void scheduledTask() {
 		try {
 			synchronizeStats();
-		} catch (Exception e) {
-			log.error(e);
-		}
-	}
-	
-	public void afterPropertiesSet() {
-		try {
-			timer.schedule(this.task, start, interval);
 		} catch (Exception e) {
 			log.error(e);
 		}
