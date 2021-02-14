@@ -72,10 +72,26 @@
 		<property name="repeatInterval" value="${backofficeService.polling.interval}" />
 	</bean>
 
+	<bean id="purgeJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="eu.christopherlee.admin.manager.TpLinkPurgeTask" />
+		<property name="jobDataMap">
+			<map>
+				<entry key="manager" value-ref="tpLinkManager" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="purgeSimpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="purgeJobDetail" />
+		<property name="startDelay" value="${backofficeService.polling.start}" />
+		<property name="repeatInterval" value="${backofficeService.polling.purge.interval}" />
+	</bean>
+
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
 				<ref bean="simpleTrigger" />
+				<ref bean="purgeSimpleTrigger" />
 			</list>
 		</property>
 	</bean>

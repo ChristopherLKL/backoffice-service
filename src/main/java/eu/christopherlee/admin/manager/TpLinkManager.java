@@ -146,8 +146,6 @@ public class TpLinkManager {
 						}
 					}
 				}
-
-				dao.deleteDeviceState(purgeDays);
 			}
 		});
 	}
@@ -155,6 +153,14 @@ public class TpLinkManager {
 	public void scheduledTask() {
 		try {
 			synchronizeStats();
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+
+	public void scheduledPurgeTask() {
+		try {
+			dao.deleteDeviceState(purgeDays);
 		} catch (Exception e) {
 			log.error(e);
 		}
