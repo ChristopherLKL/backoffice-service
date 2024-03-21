@@ -111,27 +111,49 @@ public class TpLinkManager {
 				Account account = dao.getAccount(-1);
 				if (account == null) {
 					account = fetchAccount();
-					try {
-						dao.insertAccount(account);
-					} catch (Exception e) {
-						dao.insertAccount(account, account.getAccountId());
-					}
+					log.debug("[ACCOUNT CHECK] new token: " + account.getToken());
+					dao.insertAccount(account);
 				}
 
 				List<Device> devices = dao.getDevices(account.getAccountId());
 
 				if (CollectionUtils.isEmpty(devices)) {
-					account = fetchAccount();
 					devices = fetchDevices(account);
+					log.debug("[DEVICES CHECK] new devices: " + devices.toString());
+					if (CollectionUtils.isEmpty(devices)) {
+						Account newAccount = fetchAccount();
+						account.setToken(newAccount.getToken());
+						log.debug("[DEVICES CHECK] new token: " + account.getToken());
+						dao.insertAccount(newAccount, account.getAccountId());
+						devices = fetchDevices(newAccount);
+					}
 				}
 
 				if (CollectionUtils.isNotEmpty(devices)) {
 					for (Device device : devices) {
 						try {
+							log.debug("[DEVICE STAT CHECK] browsing device");
 							String clientDeviceState = client.getState(device.getAppServerUrl(), account.getToken(), device.getDeviceId());
+							log.debug("[DEVICE STAT CHECK] app server url: " + device.getAppServerUrl());
+							log.debug("[DEVICE STAT CHECK] token: " + account.getToken());
+							log.debug("[DEVICE STAT CHECK] device id: " + device.getDeviceId());
 							Result<?> result = (Result<?>) gson.fromJson(clientDeviceState, Result.class);
+							log.debug("[DEVICE STAT CHECK] client device state: " + clientDeviceState);
+							log.debug("[DEVICE STAT CHECK] error code: " + result.getErrorCode());
+							if (clientDeviceState.contains("Token expired")) {
+								Account newAccount = fetchAccount();
+								account.setToken(newAccount.getToken());
+								log.debug("[DEVICES CHECK] new token: " + account.getToken());
+								dao.insertAccount(newAccount, account.getAccountId());
+								clientDeviceState = client.getState(device.getAppServerUrl(), account.getToken(), device.getDeviceId());
+								result = (Result<?>) gson.fromJson(clientDeviceState, Result.class);
+								log.debug("[DEVICE STAT CHECK] new client device state: " + clientDeviceState);
+								log.debug("[DEVICE STAT CHECK] new error code: " + result.getErrorCode());
+							}
 							ResponseData responseData = gson.fromJson(gson.toJson(result.getResult()), ResponseData.class);
+							log.debug("[DEVICE STAT CHECK] response data: " + responseData.getResponseData());
 							String deviceStateString = gson.fromJson(gson.toJson(responseData.getResponseData()), String.class);
+							log.debug("[DEVICE STAT CHECK] device state string: " + deviceStateString);
 							DeviceState deviceState = gson.fromJson(deviceStateString, DeviceState.class);
 							deviceState.getEmeter().getGet_realtime().setStartTime(new Date());
 							dao.insertDeviceState(deviceState);
